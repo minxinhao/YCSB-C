@@ -2,23 +2,22 @@
 // 
 //
 
-#ifndef YCSB_C_ROCKSDB_DB_H
-#define YCSB_C_ROCKSDB_DB_H
+#ifndef YCSB_C_MetaDB_DB_H
+#define YCSB_C_MetaDB_DB_H
 
 #include "core/db.h"
 #include <iostream>
 #include <string>
 #include "core/properties.h"
-#include <rocksdb/db.h>
-#include <hdr/hdr_histogram.h>
-#include <fstream>
+#include <MetaDb.h>
 #include <sys/time.h>
+#include <hdr/hdr_histogram.h>
 
 using std::cout;
 using std::endl;
 
 namespace ycsbc {
-    class RocksDB : public DB{
+    class MetaDB : public DB{
     public :
         struct hdr_histogram* hdr_ = NULL;
         struct hdr_histogram* hdr_last_1s_ = NULL;
@@ -27,36 +26,35 @@ namespace ycsbc {
         struct hdr_histogram* hdr_update_ = NULL;
         struct hdr_histogram* hdr_scan_ = NULL;
         struct hdr_histogram* hdr_delete_ = NULL;
-	struct hdr_histogram* hdr_rmw_ = NULL;
+        struct hdr_histogram* hdr_rmw_ = NULL;
 
-	void latency_hiccup(uint64_t iops);
-	std::FILE* f_hdr_output_;
-	std::FILE* f_hdr_hiccup_output_;
+        void latency_hiccup(uint64_t iops);
+        std::FILE* f_hdr_output_;
+        std::FILE* f_hdr_hiccup_output_;
 
+        MetaDB(const char *dbfilename, utils::Properties &props);
 
-        RocksDB(const char *dbfilename, utils::Properties &props);
-        int Read(const std::string &table, const std::string &key,
-                 const std::vector<std::string> *fields,
-                 std::vector<KVPair> &result);
+        ~MetaDB();
 
-        int Scan(const std::string &table, const std::string &key,
-                 int len, const std::vector<std::string> *fields,
-                 std::vector<std::vector<KVPair>> &result);
+        // Read for GetFileInode
+        int Read(uint64_t pinode,std::string& fname,uint64_t* inode);
 
-        int Insert(const std::string &table, const std::string &key,
-                   std::vector<KVPair> &values);
+        // Scan for ReadDir
+        int Scan(uint64_t pinode, std::vector<std::string>& inodes);
+
+        // Insert for file-inode
+        int Insert(uint64_t pinode, const std::string &fname,uint64_t inode);
 
         int Update(const std::string &table, const std::string &key,
                    std::vector<KVPair> &values);
 
-
         int Delete(const std::string &table, const std::string &key);
 
-	void RecordTime(int op,uint64_t tx_xtime);
+        void RecordTime(int op,uint64_t tx_xtime);
 
         void PrintStats();
 
-        bool HaveBalancedDistribution();
+        // bool HaveBalancedDistribution();
 
         uint64_t get_now_micros(){
             struct timeval tv;
@@ -64,13 +62,12 @@ namespace ycsbc {
             return (tv.tv_sec) * 1000000 + tv.tv_usec;
         }
 
-        ~RocksDB();
 
     private:
-        rocksdb::DB *db_;
+        struct MetaDb db_;
         unsigned noResult;
 
-        void SetOptions(rocksdb::Options *options, utils::Properties &props);
+        void SetOptions(DBOption *options, utils::Properties &props);
         void SerializeValues(std::vector<KVPair> &kvs, std::string &value);
         void DeSerializeValues(std::string &value, std::vector<KVPair> &kvs);
 
@@ -78,4 +75,4 @@ namespace ycsbc {
 }
 
 
-#endif //YCSB_C_ROCKSDB_DB_H
+#endif //YCSB_C_MetaDB_DB_H

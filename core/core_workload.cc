@@ -113,6 +113,8 @@ void CoreWorkload::Init(const utils::Properties &p) {
   }
   
   key_generator_ = new CounterGenerator(insert_start);
+  pinode_generator_ = new CounterGenerator(insert_start);
+  inode_generator_ = new CounterGenerator(insert_start);
   
   if (read_proportion > 0) {
     op_chooser_.AddValue(READ, read_proportion);

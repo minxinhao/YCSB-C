@@ -144,7 +144,12 @@ class CoreWorkload {
   
   virtual std::string NextTable() { return table_name_; }
   virtual std::string NextSequenceKey(); /// Used for loading data
+  virtual uint64_t NextSequencePinode(); 
+  virtual uint64_t NextSequenceInode(); 
   virtual std::string NextTransactionKey(); /// Used for transactions
+  virtual uint64_t NextTransactionPinode(); /// Used for transactions
+  virtual uint64_t NextTransactionInode(); /// Used for transactions
+
   virtual Operation NextOperation() { return op_chooser_.Next(); }
   virtual std::string NextFieldName();
   virtual size_t NextScanLength() { return scan_len_chooser_->Next(); }
@@ -154,7 +159,7 @@ class CoreWorkload {
 
   CoreWorkload() :
       field_count_(0), read_all_fields_(false), write_all_fields_(false),
-      field_len_generator_(NULL), key_generator_(NULL), key_chooser_(NULL),
+      field_len_generator_(NULL), key_generator_(NULL),pinode_generator_(NULL),inode_generator_(NULL), key_chooser_(NULL),
       field_chooser_(NULL), scan_len_chooser_(NULL), insert_key_sequence_(3),
       ordered_inserts_(true), record_count_(0) {
   }
@@ -162,6 +167,8 @@ class CoreWorkload {
   virtual ~CoreWorkload() {
     if (field_len_generator_) delete field_len_generator_;
     if (key_generator_) delete key_generator_;
+    if (pinode_generator_) delete pinode_generator_;
+    if (inode_generator_) delete inode_generator_;
     if (key_chooser_) delete key_chooser_;
     if (field_chooser_) delete field_chooser_;
     if (scan_len_chooser_) delete scan_len_chooser_;
@@ -176,15 +183,27 @@ class CoreWorkload {
   bool read_all_fields_;
   bool write_all_fields_;
   Generator<uint64_t> *field_len_generator_;
-  Generator<uint64_t> *key_generator_;
+  Generator<uint64_t> *key_generator_;    /// 3
+  Generator<uint64_t> *pinode_generator_;
+  Generator<uint64_t> *inode_generator_;
   DiscreteGenerator<Operation> op_chooser_;
-  Generator<uint64_t> *key_chooser_;
+  Generator<uint64_t> *key_chooser_;       ///     1 
   Generator<uint64_t> *field_chooser_;
   Generator<uint64_t> *scan_len_chooser_;
-  CounterGenerator insert_key_sequence_;
+  Generator<uint64_t> *pinode_chooser_;
+  Generator<uint64_t> *inode_chooser_;
+  CounterGenerator insert_key_sequence_;    ////   2
   bool ordered_inserts_;
   size_t record_count_;
 };
+
+inline uint64_t CoreWorkload::NextSequencePinode() {
+  return pinode_generator_->Next();
+}
+
+inline uint64_t CoreWorkload::NextSequenceInode() {
+  return inode_generator_->Next();
+}
 
 inline std::string CoreWorkload::NextSequenceKey() {
   uint64_t key_num = key_generator_->Next();
@@ -197,6 +216,22 @@ inline std::string CoreWorkload::NextTransactionKey() {
     key_num = key_chooser_->Next();
   } while (key_num > insert_key_sequence_.Last());
   return BuildKeyName(key_num);
+}
+
+inline uint64_t CoreWorkload::NextTransactionPinode() {
+  uint64_t key_num;
+  do {
+    key_num = pinode_chooser_->Next();
+  } while (key_num > insert_key_sequence_.Last());
+  return key_num;
+}
+
+inline uint64_t CoreWorkload::NextTransactionInode() {
+  int64_t key_num;
+  do {
+    key_num = inode_chooser_->Next();
+  } while (key_num > insert_key_sequence_.Last());
+  return key_num;
 }
 
 inline std::string CoreWorkload::BuildKeyName(uint64_t key_num) {
