@@ -164,7 +164,13 @@ namespace ycsbc {
     }
 
     int MetaDB::Update(const std::string &table, const std::string &key, std::vector<KVPair> &values) {
-    	// return Insert(table,key,values);
+        //For LBEH and DirTreeTable, update is the same as insert
+        // Status sts = InsertFileInode(&db_,pinode,(char*)fname.c_str(),inode);
+        
+        // if(sts != OK){
+        //     cout <<"MetaDB PUT() ERROR! error "<< sts << endl;
+        //     exit(0);
+        // }
         return DB::kOK;
     }
 

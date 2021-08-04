@@ -227,7 +227,7 @@ inline uint64_t CoreWorkload::NextTransactionPinode() {
 }
 
 inline uint64_t CoreWorkload::NextTransactionInode() {
-  int64_t key_num;
+  uint64_t key_num;
   do {
     key_num = inode_chooser_->Next();
   } while (key_num > insert_key_sequence_.Last());
