@@ -136,7 +136,9 @@ void CoreWorkload::Init(const utils::Properties &p) {
   
   if (request_dist == "uniform") {
     key_chooser_ = new UniformGenerator(0, record_count_ - 1);
-    
+    pinode_chooser_ = new UniformGenerator(0, record_count_ - 1);
+    // fname_chooser_ = new UniformGenerator(0, record_count_ - 1);
+    inode_chooser_ = new UniformGenerator(0, record_count_ - 1);
   } else if (request_dist == "zipfian") {
     // If the number of keys changes, we don't want to change popular keys.
     // So we construct the scrambled zipfian generator with a keyspace
@@ -146,10 +148,12 @@ void CoreWorkload::Init(const utils::Properties &p) {
     int op_count = std::stoi(p.GetProperty(OPERATION_COUNT_PROPERTY));
     int new_keys = (int)(op_count * insert_proportion * 2); // a fudge factor
     key_chooser_ = new ScrambledZipfianGenerator(record_count_ + new_keys);
-    
+    pinode_chooser_ = new ScrambledZipfianGenerator(record_count_ + new_keys);
+    inode_chooser_ = new ScrambledZipfianGenerator(record_count_ + new_keys);
   } else if (request_dist == "latest") {
     key_chooser_ = new SkewedLatestGenerator(insert_key_sequence_);
-    
+    pinode_chooser_ = new SkewedLatestGenerator(insert_key_sequence_);
+    inode_chooser_ = new SkewedLatestGenerator(insert_key_sequence_);
   } else {
     throw utils::Exception("Unknown request distribution: " + request_dist);
   }

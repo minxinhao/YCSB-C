@@ -10,7 +10,7 @@ METADB_LIBRARY=/home/minxinhao/c++/metakv_0522/libmetadb.a
 # METADB_LIB=/home/minxinhao/c++/metakv_0522/build/
 
 CC=g++
-CFLAGS=-std=c++11 -g -mcx16 -Wall -I./ -I$(METADB_INCLUDE)
+CFLAGS= -std=c++11 -g -mcx16 -Wall -I./ -I$(METADB_INCLUDE)
 LDFLAGS= -lpthread -lz -lbz2 -llz4 -ldl -lsnappy -lpmem -lpmemobj -lnuma -lzstd -lhdr_histogram -lboost_regex -lboost_iostreams -latomic
 SUBDIRS= core db 
 SUBSRCS=$(wildcard core/*.cc) $(wildcard db/*.cc)
