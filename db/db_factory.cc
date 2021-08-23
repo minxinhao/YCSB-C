@@ -17,9 +17,7 @@ using ycsbc::DB;
 using ycsbc::DBFactory;
 
 DB* DBFactory::CreateDB(utils::Properties &props) {
-  if (props["dbname"] == "basic") {
-    return new BasicDB;
-  } else if (props["dbname"] == "metadb") {
+  if (props["dbname"] == "metadb") {
     std::string dbpath = props.GetProperty("dbpath","/tmp/test-rocksdb");
     return new MetaDB(dbpath.c_str(), props);
   } else return NULL;

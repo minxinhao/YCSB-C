@@ -5,9 +5,9 @@
 #ROCKSDB_LIBRARY=/home/ubuntu/zyh/Cloud/rocksCloud/build/librocksdb.a 
 #ROCKSDB_LIB=/home/ubuntu/zyh/Cloud/rocksCloud/build/
 
-METADB_INCLUDE=/home/minxinhao/c++/metakv_0522/include
-METADB_LIBRARY=/home/minxinhao/c++/metakv_0522/libmetadb.a
-# METADB_LIB=/home/minxinhao/c++/metakv_0522/build/
+METADB_INCLUDE=/home/mxh/metakv_0522/include
+METADB_LIBRARY=/home/mxh/metakv_0522/libmetadb.a
+# METADB_LIB=/home/mxh/metakv_0522/build/
 
 CC=g++
 CFLAGS= -std=c++11 -g -mcx16 -Wall -I./ -I$(METADB_INCLUDE)

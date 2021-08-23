@@ -126,7 +126,7 @@ namespace ycsbc {
     }
 
 
-    int MetaDB::Read(uint64_t pinode,std::string& fname,uint64_t* inode){
+    int MetaDB::Read(uint64_t pinode,const std::string& fname,uint64_t* inode){
         Status sts = GetFileInode(&db_,pinode , (char*)fname.c_str(), inode);
 
         if(sts == OK) {
@@ -142,7 +142,7 @@ namespace ycsbc {
     }
 
 
-    int MetaDB::Scan(uint64_t pinode, std::vector<std::string>& inodes){
+    int MetaDB::Scan(uint64_t pinode, std::vector<std::string>& fnames,std::vector<uint64_t> inodes){
         struct hashmap* res = hashmap_new(sizeof(struct file_entry), 0, 0, 0, 
                                      file_entry_hash, file_entry_compare, NULL);
         Status sts = ReadDir(&db_,pinode,res);
@@ -163,24 +163,16 @@ namespace ycsbc {
         return DB::kOK;
     }
 
-    int MetaDB::Update(const std::string &table, const std::string &key, std::vector<KVPair> &values) {
-        //For LBEH and DirTreeTable, update is the same as insert
-        // Status sts = InsertFileInode(&db_,pinode,(char*)fname.c_str(),inode);
-        
-        // if(sts != OK){
-        //     cout <<"MetaDB PUT() ERROR! error "<< sts << endl;
-        //     exit(0);
-        // }
-        return DB::kOK;
+    int MetaDB::Update(uint64_t pinode, const std::string &fname,uint64_t inode) {
+        return Insert(pinode,fname,inode);
     }
 
-    int MetaDB::Delete(const std::string &table, const std::string &key) {
-        // MetaDB::Status s;
-        // s = db_->Delete(MetaDB::WriteOptions(),key);
-        // if(!s.ok()){
-        //     cout <<"MetaDB DEL() ERROR! error string: "<< s.ToString() << endl;
-	    // exit(0);
-        // }
+    int MetaDB::Delete(uint64_t pinode , const std::string& fname) {
+        Status sts = DeleteFileInode(&db_,pinode,(char*)fname.c_str());
+        if(sts != OK){
+            cout <<"MetaDB Delete() ERROR! error "<< sts << endl;
+            exit(0);
+        }
         return DB::kOK;
     }
 

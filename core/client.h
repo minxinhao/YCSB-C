@@ -42,19 +42,11 @@ class Client {
 };
 
 inline bool Client::DoInsert() {
-  uint64_t pinode = workload_.NextSequencePinode();
-  printf("%s pinode:%lu\n",__func__,pinode);
-  // uint64_t inode = workload_.NextSequenceInode();
-  // std::string fname = workload_.NextSequenceKey();
-
-  uint64_t inode;
-  std::string fname;
-  // define YSCB_BATCH 100
-  for(uint64_t i = 0 ; i < 100; i++){
-    inode = pinode + i ;
-    fname = std::string("string") + std::to_string(inode);
-    db_.Insert(pinode,fname,inode);
-  }
+  uint64_t pinode = workload_.NextSequenceKey();
+  for(uint64_t i = 0 ; i < 1000 ; i++){
+    std::string fname = std::to_string(i);
+    db_.Insert(pinode,fname,i);
+  }  
   return true;
 }
 
@@ -106,70 +98,51 @@ inline bool Client::DoTransaction() {
 }
 
 inline int Client::TransactionRead() {
-  uint64_t pinode = workload_.NextTransactionPinode();
-  std::string fname = workload_.NextTransactionKey();
+  const uint64_t &pinode = workload_.NextTransactionKey();
   uint64_t inode;
-  // printf("%s pinode:%lu\n",__func__,pinode);
-  for(uint64_t i = 0 ; i < 100; i++){
-    inode = pinode + i ;
-    fname = std::string("string") + std::to_string(inode);
-    db_.Insert(pinode,fname,inode);
+  for(uint64_t i = 0 ; i < 1000 ; i++){
+    std::string fname = std::to_string(i);
+    db_.Read(pinode,fname,&inode);
   }
-  return db_.Read(pinode,fname,&inode);
+  return 1;
 }
 
 inline int Client::TransactionReadModifyWrite() {
-  // const std::string &table = workload_.NextTable();
-  // const std::string &key = workload_.NextTransactionKey();
-  // std::vector<DB::KVPair> result;
+  const uint64_t pinode = workload_.NextTransactionKey();
 
-  // if (!workload_.read_all_fields()) {
-  //   std::vector<std::string> fields;
-  //   fields.push_back("field" + workload_.NextFieldName());
-  //   db_.Read(table, key, &fields, result);
-  // } else {
-  //   db_.Read(table, key, NULL, result);00
-  // }
+  uint64_t inode ;
+  for(uint64_t i = 0 ; i < 1000 ; i++){
+    std::string fname = std::to_string(i);
+    db_.Read(pinode,fname,&inode);
+    db_.Update(pinode,fname,inode+1);
+  }
 
-  // std::vector<DB::KVPair> values;
-  // if (workload_.write_all_fields()) {
-  //   workload_.BuildValues(values);
-  // } else {
-  //   workload_.BuildUpdate(values);
-  // }
-  // return db_.Update(table, key, values);
-  return DB::kOK;
+  return 1;
 }
 
 inline int Client::TransactionScan() {
-  uint64_t pinode = workload_.NextSequencePinode();
-  std::vector<std::string> res;
-  return db_.Scan(pinode,res);
-  
+  const uint64_t pinode = workload_.NextTransactionKey();
+  std::vector<std::string> fnames;
+  std::vector<uint64_t> inodes;
+  return db_.Scan(pinode, fnames, inodes);
 }
 
 inline int Client::TransactionUpdate() {
-  int64_t pinode = workload_.NextTransactionPinode();
-  std::string fname;
-  uint64_t inode;
-  for(uint64_t i = 0 ; i < 100; i++){
-    inode = pinode + i ;
-    fname = std::string("string") + std::to_string(inode);
-    db_.Insert(pinode,fname,inode);
+  const uint64_t pinode = workload_.NextTransactionKey();
+  for(uint64_t i = 0 ; i < 1000 ; i++){
+    std::string fname = std::to_string(i);
+    db_.Update(pinode,fname,i+1);
   }
-  return DB::kOK;
+  return 1;
 }
 
 inline int Client::TransactionInsert() {
-  uint64_t pinode = workload_.NextSequencePinode();
-  std::string fname;
-  uint64_t inode;
-  for(uint64_t i = 0 ; i < 100; i++){
-    inode = pinode + i ;
-    fname = std::string("string") + std::to_string(inode);
-    db_.Insert(pinode,fname,inode);
+  const uint64_t pinode = workload_.NextTransactionKey();
+  for(uint64_t i = 0 ; i < 1000 ; i++){
+    std::string fname = std::to_string(i);
+    db_.Insert(pinode,fname,i);
   }
-  return DB::kOK;
+  return 1;
 } 
 
 } // ycsbc

@@ -37,18 +37,17 @@ namespace ycsbc {
         ~MetaDB();
 
         // Read for GetFileInode
-        int Read(uint64_t pinode,std::string& fname,uint64_t* inode);
+        int Read(uint64_t pinode,const std::string& fname,uint64_t* inode);
 
         // Scan for ReadDir
-        int Scan(uint64_t pinode, std::vector<std::string>& inodes);
+        int Scan(uint64_t pinode, std::vector<std::string>&fnames, std::vector<uint64_t> inodes);
 
         // Insert for file-inode
         int Insert(uint64_t pinode, const std::string &fname,uint64_t inode);
 
-        int Update(const std::string &table, const std::string &key,
-                   std::vector<KVPair> &values);
+        int Update(uint64_t pinode, const std::string &fname,uint64_t inode);
 
-        int Delete(const std::string &table, const std::string &key);
+        int Delete(uint64_t pinode , const std::string& fname);
 
         void RecordTime(int op,uint64_t tx_xtime);
 

@@ -40,12 +40,8 @@ class DB {
   /// @param result A vector of field/value pairs for the result.
   /// @return Zero on success, or a non-zero error code on error/record-miss.
   ///
-  // virtual int Read(const std::string &table, const std::string &key,
-  //                  const std::vector<std::string> *fields,
-  //                  std::vector<KVPair> &result) = 0;
-
   // Read for GetFileInode
-  virtual int Read(uint64_t pinode,std::string& fname,uint64_t* inode) = 0;
+  virtual int Read(uint64_t pinode,const std::string& fname,uint64_t* inode) = 0;
   
   
   ///
@@ -60,12 +56,8 @@ class DB {
   ///        pairs for one record
   /// @return Zero on success, or a non-zero error code on error.
   ///
-  // virtual int Scan(const std::string &table, const std::string &key,
-  //                  int record_count, const std::vector<std::string> *fields,
-  //                  std::vector<std::vector<KVPair>> &result) = 0;
-  
   // Scan for ReadDir
-  virtual int Scan(uint64_t pinode, std::vector<std::string>& inodes) = 0;
+  virtual int Scan(uint64_t pinode, std::vector<std::string>& fnames,std::vector<uint64_t> inodes) = 0;
                    
   ///
   /// Updates a record in the database.
@@ -77,8 +69,7 @@ class DB {
   /// @param values A vector of field/value pairs to update in the record.
   /// @return Zero on success, a non-zero error code on error.
   ///
-  virtual int Update(const std::string &table, const std::string &key,
-                     std::vector<KVPair> &values) = 0;
+  virtual int Update(uint64_t pinode, const std::string &fname,uint64_t inode) = 0;
 
   ///
   /// Inserts a record into the database.
@@ -102,7 +93,7 @@ class DB {
   /// @param key The key of the record to delete.
   /// @return Zero on success, a non-zero error code on error.
   ///
-  virtual int Delete(const std::string &table, const std::string &key) = 0;
+  virtual int Delete(uint64_t pinode,const std::string& fname) = 0;
 
   virtual bool HaveBalancedDistribution() { return true;};
 

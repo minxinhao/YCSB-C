@@ -28,46 +28,39 @@ class BasicDB : public DB {
     cout << "A new thread begins working." << endl;
   }
 
-  int Read(uint64_t pinode,std::string& fname,uint64_t* inode) {
-    return DB::kOK;  
-  }
-  // int Read(const std::string &table, const std::string &key,
-  //          const std::vector<std::string> *fields,
-  //          std::vector<KVPair> &result) {
-  //   std::lock_guard<std::mutex> lock(mutex_);
-  //   cout << "READ " << table << ' ' << key;
-  //   if (fields) {
-  //     cout << " [ ";
-  //     for (auto f : *fields) {
-  //       cout << f << ' ';
-  //     }
-  //     cout << ']' << endl;
-  //   } else {
-  //     cout  << " < all fields >" << endl;
-  //   }
-  //   return 0;
-  // }
-
-  int Scan(uint64_t pinode, std::vector<std::string>& inodes){
-    return DB::kOK;  
+  int Read(const std::string &table, const std::string &key,
+           const std::vector<std::string> *fields,
+           std::vector<KVPair> &result) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    cout << "READ " << table << ' ' << key;
+    if (fields) {
+      cout << " [ ";
+      for (auto f : *fields) {
+        cout << f << ' ';
+      }
+      cout << ']' << endl;
+    } else {
+      cout  << " < all fields >" << endl;
+    }
+    return 0;
   }
 
-  // int Scan(const std::string &table, const std::string &key,
-  //          int len, const std::vector<std::string> *fields,
-  //          std::vector<std::vector<KVPair>> &result) {
-  //   std::lock_guard<std::mutex> lock(mutex_);
-  //   cout << "SCAN " << table << ' ' << key << " " << len;
-  //   if (fields) {
-  //     cout << " [ ";
-  //     for (auto f : *fields) {
-  //       cout << f << ' ';
-  //     }
-  //     cout << ']' << endl;
-  //   } else {
-  //     cout  << " < all fields >" << endl;
-  //   }
-  //   return 0;
-  // }
+  int Scan(const std::string &table, const std::string &key,
+           int len, const std::vector<std::string> *fields,
+           std::vector<std::vector<KVPair>> &result) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    cout << "SCAN " << table << ' ' << key << " " << len;
+    if (fields) {
+      cout << " [ ";
+      for (auto f : *fields) {
+        cout << f << ' ';
+      }
+      cout << ']' << endl;
+    } else {
+      cout  << " < all fields >" << endl;
+    }
+    return 0;
+  }
 
   int Update(const std::string &table, const std::string &key,
              std::vector<KVPair> &values) {
@@ -80,20 +73,16 @@ class BasicDB : public DB {
     return 0;
   }
 
-  int Insert(uint64_t pinode, const std::string &fname,uint64_t inode){
-    return DB::kOK;
+  int Insert(const std::string &table, const std::string &key,
+             std::vector<KVPair> &values) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    cout << "INSERT " << table << ' ' << key << " [ ";
+    for (auto v : values) {
+      cout << v.first << '=' << v.second << ' ';
+    }
+    cout << ']' << endl;
+    return 0;
   }
-
-  // int Insert(const std::string &table, const std::string &key,
-  //            std::vector<KVPair> &values) {
-  //   std::lock_guard<std::mutex> lock(mutex_);
-  //   cout << "INSERT " << table << ' ' << key << " [ ";
-  //   for (auto v : values) {
-  //     cout << v.first << '=' << v.second << ' ';
-  //   }
-  //   cout << ']' << endl;
-  //   return 0;
-  // }
 
   int Delete(const std::string &table, const std::string &key) {
     std::lock_guard<std::mutex> lock(mutex_);
